@@ -56,6 +56,12 @@ class main_frame(Tk):
 				'\\' + 
 				self.img_value.get() +
 				".jpg", "jpeg")
+		next_idx = str(int(self.s3_var.get()) + 1)
+		print(int(self.s3_var.get()))
+		if len(next_idx) == 1:
+			next_idx = "0" + next_idx
+		self.s3_var.set(next_idx)
+		self.img_label_change()
 
 	def img_frame(self):
 		res_x = 1900
@@ -78,6 +84,10 @@ class main_frame(Tk):
 										#compound="left",
 										width=10)
 		self.pic_button.place(x=317,y=63)
+
+	def onselect_listbox(self, evt):
+		sel = evt.widget.curselection()[0]
+		self.img_label_change()
 
 	def img_label_change(self):
 		self.img_value.set(self.s1_var.get() + 
@@ -105,6 +115,7 @@ class main_frame(Tk):
 		self.screen_list.insert(1, "SAVE")
 		self.screen_list.insert(2, "TREC")
 		self.screen_list.insert(3, "TBLT")
+		self.screen_list.bind('<<ListboxSelect>>', self.onselect_listbox)
 		self.screen_list.place(x=90,y=65)
 
 	def spinBox(self, var, vals, pos_x):
