@@ -86,7 +86,7 @@ class main_frame(Tk):
 		self.pic_button.place(x=317,y=63)
 
 	def onselect_listbox(self, evt):
-		sel = evt.widget.curselection()[0]
+		#sel = evt.widget.curselection()[0]
 		self.img_label_change()
 
 	def img_label_change(self):
