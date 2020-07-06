@@ -1,8 +1,8 @@
 from tkinter import *
 from tkinter import filedialog
 from tkinter import ttk
+from PIL import ImageGrab
 import pathlib
-import pyautogui
 
 class main_frame(Tk):
 	def __init__(self):
@@ -19,7 +19,9 @@ class main_frame(Tk):
 		self.browse_butt()
 		#----------- resolution label -----
 		self.dim_var=StringVar()
-		self.dim_var.set("1800x4000 [1900x1080]")
+		self.dim_var.set("1800x4000 [{0}x{1}]".format(
+							self.winfo_screenwidth(),
+							self.winfo_screenheight()))
 		self.dim_label(self.dim_var)
 		#----------- radiobutton option ---
 		self.tso_option=StringVar()
@@ -49,20 +51,23 @@ class main_frame(Tk):
 		#----------- end ------------------
 
 	def pic_cmd(self):
-		if self.tso_option.get() == "CICS":
-			self.tso_option.set("TSO")
-		else:
-			self.tso_option.set("CICS")
+		img = ImageGrab.grab(bbox=self.img_frame())
+		img.save(self.path_var.get() +
+				'\\' + 
+				self.img_value.get() +
+				".jpg", "jpeg")
 
-		myScreenshot = pyautogui.screenshot()
-		myScreenshot.save(self.path_var.get() +
-							'\\' + 
-							self.img_value.get() +
-							'.jpg')
-		#self.s3_w.invoke('buttonup')
-		#self.s1_var.set("01")
-		#self.s2_var.set("A")
-		#self.s3_var.set("01")
+	def img_frame(self):
+		res_x = 1900
+		res_y = 1080
+		if self.tso_option.get() == "CICS":
+			x = 350
+			y = 150
+		else:
+			x = 430
+			y = 120
+		frame = (x,	y, res_x - 2 * x, res_y - 2 * y)
+		return frame
 
 	def pic_butt(self):
 		self.image_bpic = PhotoImage(file="Images\\icons8-screenshot-64.png")
@@ -163,4 +168,6 @@ class main_frame(Tk):
 
 if __name__ == "__main__":
 	root = main_frame()
+	print(root.winfo_screenwidth())
+	print(root.winfo_screenheight())
 	root.mainloop()
