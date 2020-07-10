@@ -45,7 +45,7 @@ class main_frame(Tk):
 		#----------- picture name label ---
 		self.img_value = StringVar()
 		self.img_label_change()
-		self.img_label()
+		self.lllll = self.img_label()
 		#----------- picture button -------
 		self.pic_butt()
 		#----------- end ------------------
@@ -94,14 +94,18 @@ class main_frame(Tk):
 							self.s2_var.get() + "_" + 
 							self.screen_list.get(ANCHOR) + "_" +
 							self.s3_var.get())
+		img_path = self.path_var.get() + "\\" + self.img_value.get() + ".jpg"
+		print(img_path)
 
 	def img_label(self):
 		self.img_label_w = ttk.Label(self,
 									width=15,
 									font=("Monospace",10),
 									justify="left",
+									background=None,
 									textvariable=self.img_value)
 		self.img_label_w.place(x=10,y=35)
+		return self.img_label_w
 
 	def listBox(self):
 		self.screen_list = Listbox(self,
