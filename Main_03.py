@@ -170,7 +170,10 @@ class main_frame(Tk):
 		self.br_button.place(x=360,y=5)
 
 	def browse_cmd(self):
-		folder_path = filedialog.askdirectory()
+		folder_path = filedialog.askdirectory(
+			title="Select where to save the images",
+			initialdir=self.path_var.get()
+			)
 		if folder_path != "":
 			self.path_var.set(folder_path)
 
@@ -183,6 +186,4 @@ class main_frame(Tk):
 
 if __name__ == "__main__":
 	root = main_frame()
-	print(root.winfo_screenwidth())
-	print(root.winfo_screenheight())
 	root.mainloop()
