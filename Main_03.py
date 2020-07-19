@@ -3,6 +3,7 @@ from tkinter import filedialog
 from tkinter import ttk
 from PIL import ImageGrab
 import pathlib
+import os
 
 class main_frame(Tk):
 	def __init__(self):
@@ -96,6 +97,7 @@ class main_frame(Tk):
 							self.s3_var.get())
 		img_path = self.path_var.get() + "\\" + self.img_value.get() + ".jpg"
 		print(img_path)
+		#print(os.path.isfile(img_path))
 
 	def img_label(self):
 		self.img_label_w = ttk.Label(self,
@@ -172,6 +174,7 @@ class main_frame(Tk):
 	def browse_cmd(self):
 		folder_path = filedialog.askdirectory(
 			title="Select where to save the images",
+			#initialdir=self.path_var.get()
 			initialdir=self.path_var.get()
 			)
 		if folder_path != "":
