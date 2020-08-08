@@ -1,11 +1,21 @@
 from tkinter import *
 from tkinter import ttk
 from class_tab import *
+from import_settings import *
 
 class main_frame(Tk):
 
 	#img_tab = tab()
 	#setting_tab = tab()
+
+	global settings
+	settings = {}
+
+	class my_notebook:
+		print("aaaaa")
+
+	class settings_parameters:
+		print("vvvvv")
 
 	def __init__(self):
 		#----------- root -----------------
@@ -19,3 +29,4 @@ class main_frame(Tk):
 		self.tab2 = tab(my_not)
 		my_not.add(self.tab1, text="Print screen")
 		my_not.add(self.tab2, text="Settings")
+

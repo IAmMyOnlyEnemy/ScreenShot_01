@@ -3,7 +3,6 @@ from tkinter import filedialog
 from tkinter import ttk
 from PIL import ImageGrab
 import pathlib
-import os
 
 class main_frame(Tk):
 	def __init__(self):
@@ -118,10 +117,12 @@ class main_frame(Tk):
 								height=4,
 								width=10)
 		self.screen_list.insert(0, "CONT")
-		self.screen_list.insert(0, "SAVE")
-		self.screen_list.insert(0, "TREC")
-		self.screen_list.insert(0, "TBLT")
+		self.screen_list.insert(1, "SAVE")
+		self.screen_list.insert(2, "TREC")
+		self.screen_list.insert(3, "TBLT")
 		self.screen_list.bind('<<ListboxSelect>>', self.onselect_listbox)
+		self.screen_list.select_set(0)
+		self.screen_list.event_generate("<<ListboxSelect>>")
 		self.screen_list.place(x=90,y=65)
 
 	def spinBox(self, var, vals, pos_x):

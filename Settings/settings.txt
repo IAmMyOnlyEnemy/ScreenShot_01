@@ -1,0 +1,4 @@
+TSO_dimmension: 450, 950
+CICS_dimmension: 600, 950
+screen_list: CONT, SAVE, TREC, TBLT, TREV
+save_path: C:\Users\enach\desktop\python\screenshot_01
