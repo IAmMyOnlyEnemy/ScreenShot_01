@@ -5,28 +5,26 @@ def get_settings():
 	''' ---------------
 	Global values:
 	    --------------- '''
-	global settings_dict
 	settings_dict = {}
-	global file_name
 	file_name = "Settings\\settings.txt"
 
 	''' ---------------
 	Fill the input file if there is none:
 	    --------------- '''
 	if not path.exists(file_name):
-		fill_file()
+		fill_file(file_name)
 	''' ---------------
 	Filling the dictionary values from input file:
 	    --------------- '''
-	fill_dict()
 
+	fill_dict(file_name,settings_dict)
 	''' ---------------
 	Return the seeting dictionary:
 	    --------------- '''
-	#print(settings_dict)
+
 	return settings_dict
 
-def fill_dict():
+def fill_dict(file_name,settings_dict):
 	file1 = open(file_name,'r')
 	lines = file1.read().splitlines()
 	for line in lines:
@@ -38,12 +36,16 @@ def fill_dict():
 				int(val)
 				dict_value[idx] = int(val)
 			except ValueError:
-				pass
+				try:
+					float(val)
+					dict_value[idx] = float(val)
+				except:
+					pass
 
 		settings_dict.update({dict_key : dict_value})
 	file1.close()
 
-def fill_file():
+def fill_file(file_name):
 	file1 = open(file_name,'w')
 	file1.writelines("TSO_dimmension: 450, 950\n")
 	file1.writelines("CICS_dimmension: 600, 950\n")

@@ -4,24 +4,16 @@ from class_tab import *
 from import_settings import *
 
 class main_frame(Tk):
+	global global_settings
+	global_settings = get_settings()
+	print(global_settings)
+	print(global_settings['CICS_dimmension'][0])
 
-	#img_tab = tab()
-	#setting_tab = tab()
-
-	global settings
-	#settings = {}
-	settings = get_settings()
-	print(settings)
-	print(settings['CICS_dimmension'][0])
-
-	class my_notebook:
-		print("aaaaa")
-
-	class settings_parameters:
-		print("vvvvv")
+	def create_notebook():
+		pass
 
 	def __init__(self):
-		#----------- root -----------------
+		#----------- root ---------------------------
 		super(main_frame,self).__init__()
 		self.title("Main 04, upgrade!")
 		self.minsize(width=400, height=200)
