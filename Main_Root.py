@@ -9,7 +9,10 @@ class main_frame(Tk):
 	#setting_tab = tab()
 
 	global settings
-	settings = {}
+	#settings = {}
+	settings = get_settings()
+	print(settings)
+	print(settings['CICS_dimmension'][0])
 
 	class my_notebook:
 		print("aaaaa")
@@ -29,4 +32,3 @@ class main_frame(Tk):
 		self.tab2 = tab(my_not)
 		my_not.add(self.tab1, text="Print screen")
 		my_not.add(self.tab2, text="Settings")
-
