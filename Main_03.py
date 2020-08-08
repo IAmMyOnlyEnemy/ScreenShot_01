@@ -3,6 +3,7 @@ from tkinter import filedialog
 from tkinter import ttk
 from PIL import ImageGrab
 import pathlib
+from os import path
 
 class main_frame(Tk):
 	def __init__(self):
@@ -90,13 +91,15 @@ class main_frame(Tk):
 		self.img_label_change()
 
 	def img_label_change(self):
-		self.img_value.set(self.s1_var.get() + 
+		self.img_value.set(	self.s1_var.get() + 
 							self.s2_var.get() + "_" + 
 							self.screen_list.get(ANCHOR) + "_" +
 							self.s3_var.get())
 		img_path = self.path_var.get() + "\\" + self.img_value.get() + ".jpg"
+
 		print(img_path)
-		#print(os.path.isfile(img_path))
+		#if path.exists(img_path):
+		#	self.img_label.config(bg="gray")
 
 	def img_label(self):
 		self.img_label_w = ttk.Label(self,
