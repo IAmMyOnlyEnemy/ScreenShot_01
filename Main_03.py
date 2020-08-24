@@ -4,8 +4,13 @@ from tkinter import ttk
 from PIL import ImageGrab
 import pathlib
 from os import path
+from import_settings import *
 
 class main_frame(Tk):
+
+	global global_settings
+	global_settings = get_settings()
+
 	def __init__(self):
 		#----------- root -----------------
 		super(main_frame,self).__init__()
@@ -14,19 +19,22 @@ class main_frame(Tk):
 		self.wm_iconbitmap("Images\\zoom_01.ico")
 		#----------- path entry -----------
 		self.path_var=StringVar()
-		self.path_var.set(pathlib.Path().absolute())
+		#self.path_var.set(pathlib.Path().absolute())
+		self.path_var.set(global_settings['save_path'][0])
 		self.path_entry(self.path_var)
 		#----------- path button ----------
 		self.browse_butt()
 		#----------- resolution label -----
 		self.dim_var=StringVar()
-		self.dim_var.set("1800x4000 [{0}x{1}]".format(
+		self.dim_var.set("   {0}x{1} [{2}x{3}]".format(
+							global_settings['CICS_dimmension'][0],
+							global_settings['CICS_dimmension'][1],
 							self.winfo_screenwidth(),
 							self.winfo_screenheight()))
 		self.dim_label(self.dim_var)
 		#----------- radiobutton option ---
 		self.tso_option=StringVar()
-		self.tso_option.set("CICS")
+		self.tso_option.set(global_settings['TSO_option'][0])
 		self.tso_radbut(self.tso_option,"CICS",130)
 		self.tso_radbut(self.tso_option,"TSO",190)
 		#----------- spinboxes ------------
@@ -46,7 +54,10 @@ class main_frame(Tk):
 		#----------- picture name label ---
 		self.img_value = StringVar()
 		self.img_label_change()
-		self.lllll = self.img_label()
+		#print(aaaaa)
+		self.img_label = self.img_label()
+		#if aaaaa:
+		#	self.img_label.config(background="Red")
 		#----------- picture button -------
 		self.pic_butt()
 		#----------- end ------------------
@@ -65,15 +76,15 @@ class main_frame(Tk):
 		self.img_label_change()
 
 	def img_frame(self):
-		res_x = 1900
-		res_y = 1080
+		res_x = self.winfo_screenwidth()
+		res_y = self.winfo_screenheight()
 		if self.tso_option.get() == "CICS":
-			x = 350
-			y = 150
+			x = (res_x - global_settings['CICS_dimmension'][0]) / 2
+			y = (res_y - global_settings['CICS_dimmension'][1]) / 2
 		else:
-			x = 430
-			y = 120
-		frame = (x,	y, res_x - 2 * x, res_y - 2 * y)
+			x = (res_x - global_settings['TSO_dimmension'][0]) / 2
+			y = (res_y - global_settings['TSO_dimmension'][1]) / 2
+		frame = (x, y, res_x - x, res_y - y )
 		return frame
 
 	def pic_butt(self):
@@ -96,10 +107,14 @@ class main_frame(Tk):
 							self.screen_list.get(ANCHOR) + "_" +
 							self.s3_var.get())
 		img_path = self.path_var.get() + "\\" + self.img_value.get() + ".jpg"
-
 		print(img_path)
-		#if path.exists(img_path):
-		#	self.img_label.config(bg="gray")
+		#self.img_label.config(background="Red")
+		'''if path.exists(img_path):
+			#return True
+			self.img_label.config(background="Red")
+		else:
+			#return False
+			pass'''
 
 	def img_label(self):
 		self.img_label_w = ttk.Label(self,
@@ -159,26 +174,25 @@ class main_frame(Tk):
 
 	def dim_label(self,dim_value):
 		self.dim_label_w = ttk.Label(self,
-									width=21,
+									width=23,
 									font=("Monospace",10),
 									justify="right",
 									textvariable=dim_value)
-		self.dim_label_w.place(x=255,y=35)
+		self.dim_label_w.place(x=250,y=35)
 
 	def browse_butt(self):
 		self.image_bbr = PhotoImage(file="Images\\folder_icon2.png")
 		self.br_button = ttk.Button(self,
-										command=self.browse_cmd,
-										image=self.image_bbr,
-										#text="Browse", 
-										#compound="left",
-										width=5)
-		self.br_button.place(x=360,y=5)
+									command=self.browse_cmd,
+									image=self.image_bbr,
+									text="Browse", 
+									compound="left",
+									width=6)
+		self.br_button.place(x=325,y=5)
 
 	def browse_cmd(self):
 		folder_path = filedialog.askdirectory(
 			title="Select where to save the images",
-			#initialdir=self.path_var.get()
 			initialdir=self.path_var.get()
 			)
 		if folder_path != "":
@@ -188,7 +202,7 @@ class main_frame(Tk):
 		self.path_entry_w = ttk.Entry(self,
 							justify="left",
 							textvariable=str_path,
-							width=55)
+							width=51)
 		self.path_entry_w.place(x=10,y=8)
 
 if __name__ == "__main__":
