@@ -50,7 +50,7 @@ def fill_file(file_name):
 	file1.writelines("TSO_dimmension: 450, 950\n")
 	file1.writelines("CICS_dimmension: 600, 950\n")
 	file1.writelines("TSO_option: CICS\n")
-	file1.writelines("Checkbox_options: 1, 1, 1, 1\n")
+	file1.writelines("Checkbox_options: 0, 0, 0, 0\n")
 	file1.writelines("screen_list: CONT, SAVE, TREC, TBLT, TREV\n")
 	file1.writelines("form_dimensions: 400, 200\n")
 	file1.writelines("save_path: {0}".format(pathlib.Path().absolute()))

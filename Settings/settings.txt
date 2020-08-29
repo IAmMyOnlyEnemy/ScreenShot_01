@@ -1,7 +1,7 @@
 TSO_dimmension: 800, 600
 CICS_dimmension: 1000, 500
 TSO_option: CICS
-Checkbox_options: 1, 1, 1, 1
+Checkbox_options: 0, 0, 0, 0
 screen_list: CONT, SAVE, TREC, TBLT, TREV
 form_dimensions: 400, 250
 save_path: C:\Users\enach\Desktop\Python\Screenshot_01\Teste
