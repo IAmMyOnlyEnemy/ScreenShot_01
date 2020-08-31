@@ -1,9 +1,11 @@
-import tkinter as tk                # python 3
-from tkinter import ttk             # python 3
-from tkinter import font as tkfont  # python 3
+import tkinter as tk                
+from tkinter import ttk            
+from tkinter import font as tkfont 
 from tkinter import filedialog
 from PIL import ImageGrab
+from os import path
 from import_settings import *
+
 
 class SampleApp(tk.Tk):
 
@@ -15,6 +17,9 @@ class SampleApp(tk.Tk):
         self.title("Main 06, sper ca e bine...")
         self.minsize(width=global_settings["form_dimensions"][0],
                     height=global_settings["form_dimensions"][1])
+        self.maxsize(width=global_settings["form_dimensions"][0],
+                    height=global_settings["form_dimensions"][1])
+        self.geometry("{0}x{1}".format(global_settings["form_dimensions"][0], global_settings["form_dimensions"][1]))
         self.wm_iconbitmap("Images\\zoom_01.ico")
         self.title_font = tkfont.Font(family='Helvetica',size=12,weight="bold",slant="italic")
         container = ttk.Notebook(self)
@@ -32,7 +37,6 @@ class SampleApp(tk.Tk):
     def show_frame(self, page_name):
         frame = self.frames[page_name]
         frame.tkraise()
-        print(page_name)
 
 class PrintScreen(tk.Frame):
     def __init__(self, parent, controller):
@@ -40,27 +44,20 @@ class PrintScreen(tk.Frame):
         self.controller = controller
 
         self.pathentry=MyEntry(parent=self, entry_setts=[51, 10, 8])
-
         self.imglabel=MyLabel(parent=self, label_setts=[None, 15, "w", 10, 30])
         self.imglabel.config(justify=tk.LEFT)
+
         self.tso_option=tk.StringVar()
         self.tso_option.set(global_settings['TSO_option'][0])
         self.reslabel=MyLabel(parent=self, label_setts=[None, 18, "e", 245, 30])
         cics_radbutt = MyRadiobutt(parent=self,op_val=self.tso_option,val="CICS",pos_x=135)
         tso_radbutt = MyRadiobutt(parent=self,op_val=self.tso_option,val="TSO",pos_x=190)
-        cics_radbutt.config(command=self.update_frame_res())
-        tso_radbutt.config(command=self.update_frame_res())
-        
+        cics_radbutt.config(command=self.update_frame_res)
+        tso_radbutt.config(command=self.update_frame_res)
         self.update_frame_res()
-        '''
-        self.reslabel.set_label(
-                "{0} x {1} [{2}x{3}]".format(
-                                    global_settings['CICS_dimmension'][0],
-                                    global_settings['CICS_dimmension'][1],
-                                    self.winfo_screenwidth(),
-                                    self.winfo_screenheight())
-                                )
-        '''
+        self.statuslabel=MyLabel(parent=self, label_setts=[None, 50, "w", 10, 200])
+        self.statuslabel.set_label("Ready!")
+
         self.image_bbr = tk.PhotoImage(file="Images\\Browse_button.png")
         browse_button = tk.Button(self,
                             command=self.browse_command,
@@ -78,23 +75,26 @@ class PrintScreen(tk.Frame):
         up_button = tk.Button(self,
                             text="Up",
                             compound="center",
-                            command=lambda: self.screenlist.move_up(),
+                            command=lambda: self.statuslabel.set_label(self.screenlist.move_up()),
                             width=3
                             ).place(x=10,y=170)
         down_button = tk.Button(self,
                             text="Dn",
                             compound="center",
-                            command=lambda: self.screenlist.move_down(),
+                            command=lambda: self.statuslabel.set_label(self.screenlist.move_down()),
                             width=3
                             ).place(x=50,y=170)
         del_button = tk.Button(self,
                             text="Del",
                             compound="center",
-                            command=lambda: self.screenlist.delete_item(),
+                            command=lambda: self.statuslabel.set_label(self.screenlist.delete_item()),
                             width=4
                             ).place(x=170,y=170)
 
-        self.screenlist = MyList(parent=self)
+        frm = tk.Frame(self,width=15, height=50, bg="Red")
+        frm.place(x=90,y=80)
+
+        self.screenlist = MyList(parent=frm)
         self.screenlist.bind('<<ListboxSelect>>', self.onselect_listbox)
         self.screenlist.event_generate("<<ListboxSelect>>")
 
@@ -104,22 +104,25 @@ class PrintScreen(tk.Frame):
         self.spin1.config(command=self.set_img_name)
         self.spin2 = MySpinbox(parent=self,spinvals=lett_vals,pos_x=50)
         self.spin2.config(command=self.set_img_name)
-        self.spin3 = MySpinbox(parent=self,spinvals=num_vals,pos_x=170)
+        self.spin3 = MySpinbox(parent=self,spinvals=num_vals,pos_x=190)
         self.spin3.config(command=self.set_img_name)
 
         self.checkbox1 = MyCheckbox(parent=self,pos_x=12)
-        self.checkbox1.set_checkbox(global_settings['Checkbox_options'][0])
+        self.checkbox1.set_checkbox(global_settings['checkbox_options'][0])
         self.checkbox2 = MyCheckbox(parent=self,pos_x=52)
-        self.checkbox2.set_checkbox(global_settings['Checkbox_options'][1])
+        self.checkbox2.set_checkbox(global_settings['checkbox_options'][1])
         self.checkbox3 = MyCheckbox(parent=self,pos_x=92)
-        self.checkbox3.set_checkbox(global_settings['Checkbox_options'][2])
-        self.checkbox4 = MyCheckbox(parent=self,pos_x=172)
-        self.checkbox4.set_checkbox(global_settings['Checkbox_options'][3])
+        self.checkbox3.set_checkbox(global_settings['checkbox_options'][2])
+        self.checkbox4 = MyCheckbox(parent=self,pos_x=192)
+        self.checkbox4.set_checkbox(global_settings['checkbox_options'][3])
 
+        self.ontopcheckbox = MyCheckbox(parent=self,pos_x=300)
+        self.ontopcheckbox.config(text="Stay on top")
+        self.ontopcheckbox.config(command=self.toggleontop)
         self.listentry=MyEntry(parent=self, entry_setts=[12, 90, 175])
-        self.listentry.set_entry(self.screenlist.get_selected())
+        self.listentry.bind('<Return>', self.onenter_entry)
+        
         self.set_img_name()
-        print(len(self.screenlist.cget('listvariable')))
 
     def browse_command(self):
         folder_path = filedialog.askdirectory(
@@ -143,18 +146,22 @@ class PrintScreen(tk.Frame):
         return vals
 
     def pic_cmd(self):
-        img = ImageGrab.grab(bbox=self.img_frame())
-        img.save(self.pathentry.get_entry() + '\\' + 
-                self.imglabel.get_label() + ".jpg", "jpeg")
-
-        if self.checkbox1.get_checkbox():
-            self.spin1.spinNext()
-        if self.checkbox2.get_checkbox():
-            self.spin2.spinNext()
-        if self.checkbox4.get_checkbox():
-            self.spin3.spinNext()
-
-        self.set_img_name()
+        try:
+            img = ImageGrab.grab(bbox=self.img_frame())
+            img.save(self.pathentry.get_entry() + '\\' + 
+                     self.imglabel.get_label() + ".jpg", "jpeg")
+            if self.checkbox1.get_checkbox():
+                self.spin1.spinNext()
+            if self.checkbox2.get_checkbox():
+                self.spin2.spinNext()
+            if self.checkbox3.get_checkbox():
+                self.screenlist.set_next()
+            if self.checkbox4.get_checkbox():
+                self.spin3.spinNext()
+            self.statuslabel.set_label("Picture saved")
+            self.set_img_name()
+        except:
+            self.statuslabel.set_label("Could not save picture")
 
     def img_frame(self):
         res_x = self.winfo_screenwidth()
@@ -177,14 +184,18 @@ class PrintScreen(tk.Frame):
 
     def set_img_name(self):
         self.imglabel.set_label(self.get_img_name())
+        self.imglabel.config(font=("Monospac821 BT",10))
+        self.listentry.set_entry(self.screenlist.get_selected())
+        if path.exists(self.pathentry.get_entry() + '\\' + 
+                       self.imglabel.get_label()  + ".jpg"):
+            self.imglabel.config(fg="Red")
+        else:
+            self.imglabel.config(fg="Black")
 
     def onselect_listbox(self, evt):
         self.set_img_name()
-        self.listentry.set_entry(self.screenlist.get_selected())
 
     def update_frame_res(self):
-        print(global_settings[self.tso_option.get() + '_dimmension'][0])
-        print(global_settings[self.tso_option.get() + '_dimmension'][1])
         self.reslabel.set_label(
                 "{0} x {1} [{2}x{3}]".format(
                                     global_settings[self.tso_option.get() + '_dimmension'][0],
@@ -192,6 +203,18 @@ class PrintScreen(tk.Frame):
                                     self.winfo_screenwidth(),
                                     self.winfo_screenheight())
                                 )
+
+    def onenter_entry(self,evt):
+        print("Am apasat Enter")
+        self.screenlist.insert_new(self.listentry.get_entry())
+
+    def toggleontop(self):
+        if self.ontopcheckbox.get_checkbox():
+            self.controller.wm_attributes("-topmost", 1)
+            self.statuslabel.set_label("Always on top activated")
+        else:
+            self.controller.wm_attributes("-topmost", 0)
+            self.statuslabel.set_label("Always on top deactivated")
 
 class MyEntry(tk.Entry):
     def __init__(self,parent,entry_setts):
@@ -219,7 +242,6 @@ class MyLabel(tk.Label):
         self.config(width=label_setts[1])
         self.config(anchor=label_setts[2])
         self.config(textvariable=self.label_var)
-        self.config(bg="Red")
         self.place(x=label_setts[3],y=label_setts[4])
 
     def set_label(self, new_text):
@@ -231,51 +253,84 @@ class MyLabel(tk.Label):
 class MyRadiobutt(tk.Radiobutton):
     def __init__(self,parent=None,op_val=None,val="",pos_x=0):
         tk.Radiobutton.__init__(self,parent)
-        self.config(bg="White")
         self.config(text=val)
         self.config(variable=op_val)
         self.config(value=val)
-        self.config(width=6)
-        self.config(indicator = 0)
         self.place(x=pos_x,y=28)
-
-    def set_active(self,activetext):
-        self.tso_option.set(activetext)
 
 class MyList(tk.Listbox):
     def __init__(self,parent):
         tk.Listbox.__init__(self,parent)
         self.config(exportselection=0)
         self.config(font=("Monospace",10))
-        self.config(selectmode=tk.SINGLE),
+        self.config(selectmode=tk.SINGLE)
         self.config(height=len(global_settings["screen_list"]))
         self.config(width=10)
         for i, item in enumerate(global_settings["screen_list"]):
             self.insert(tk.END, item)
+        self.listdim=len(global_settings["screen_list"])
+        self.mylistscrollbar=tk.Scrollbar(parent, orient="vertical", width=20)
+        self.mylistscrollbar.pack(side=tk.RIGHT, fill=tk.BOTH)
+        self.mylistscrollbar.pack()
+        self.config(yscrollcommand=self.mylistscrollbar.set)
+        self.mylistscrollbar.config(command=self.yview)
         self.select_set(0)
-        self.check_scrollbar()
-        self.place(x=90,y=80)
+        self.pack(side=tk.LEFT)
 
     def get_selected(self):
         return self.get(self.curselection())
 
+    def set_next(self):
+        try:
+            pos = self.curselection()[0] + 1
+            if pos < self.listdim:
+                self.selection_clear(0,tk.END)
+                self.select_set(pos)
+            else:
+                pass
+        except:
+            pass
+
     def insert_new(self,newitem):
         print("Insert new value in list")
         self.insert(tk.END, newitem)
-        self.check_scrollbar()
 
     def move_up(self):
-        print("Move selected value up")
+        try:
+            pos=self.curselection()[0]
+            text=self.get(pos)
+            if pos != 0:
+                self.delete(pos)
+                self.insert(pos-1, text)
+                self.select_set(pos-1)
+                return "Item moved up"
+            else:
+                return "Cannot move item up"
+        except:
+            return "Impossible to move up"
 
     def move_down(self):
-        print("Move selected value down")
+        try:
+            pos=self.curselection()[0]
+            text=self.get(pos)
+            if pos != self.listdim - 1:
+                self.delete(pos)
+                self.insert(pos+1, text)
+                self.select_set(pos+1)
+                return "Item moved down"
+            else:
+                return "Cannot move item down"
+        except:
+            return "Impossible to move down"
 
     def delete_item(self):
-        print("Delete this item")
-        self.check_scrollbar()
-
-    def check_scrollbar(self):
-        print("Check if a scrollbar is needed or not")
+        try:
+            self.delete(self.curselection())
+            self.listdim -= 1
+            print(self.listdim)
+            return "Item deleted"
+        except:
+            return "Delete not possible"
 
 class MySpinbox(tk.Spinbox):
     def __init__(self,parent=None,spinvals=None,pos_x=0):
@@ -285,7 +340,6 @@ class MySpinbox(tk.Spinbox):
         self.config(values=spinvals)
         self.config(width=3)
         self.config(justify="center")
-        self.config(bg="Green")
         self.place(x=pos_x,y=80)
 
     def spinNext(self):
@@ -336,7 +390,6 @@ class MyCheckbox(tk.Checkbutton):
         self.config(variable=self.checkbox_var)
         self.config(onvalue=1)
         self.config(offvalue=0)
-        self.config(bg="Blue")
         self.place(x=pos_x,y=53)
 
     def get_checkbox(self):
@@ -360,4 +413,5 @@ class Settings(tk.Frame):
 
 if __name__ == "__main__":
     app = SampleApp()
+    #app.wm_attributes("-topmost", 1)
     app.mainloop()
