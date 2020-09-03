@@ -14,7 +14,7 @@ class SampleApp(tk.Tk):
 
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
-        self.title("Main 06, sper ca e bine...")
+        self.title("Main 07, sper ca e bine...")
         self.minsize(width=global_settings["form_dimensions"][0],
                     height=global_settings["form_dimensions"][1])
         self.maxsize(width=global_settings["form_dimensions"][0],
@@ -26,13 +26,14 @@ class SampleApp(tk.Tk):
         container.pack(side="top", fill="both", expand=True)
 
         self.frames = {}
-        for F in (PrintScreen, Settings):
+        for F in (PrintScreen, ChainPrints):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
             container.add(frame, text=page_name)
 
         self.show_frame("PrintScreen")
+        #self.protocol("WM_DELETE_WINDOW", self.frames[0].update_settings)
 
     def show_frame(self, page_name):
         frame = self.frames[page_name]
@@ -44,18 +45,21 @@ class PrintScreen(tk.Frame):
         self.controller = controller
 
         self.pathentry=MyEntry(parent=self, entry_setts=[51, 10, 8])
-        self.imglabel=MyLabel(parent=self, label_setts=[None, 15, "w", 10, 30])
+        self.imglabel=MyLabel(parent=self, label_setts=[15, "w", 10, 30])
         self.imglabel.config(justify=tk.LEFT)
 
+        frmrdbt = tk.Frame(self,width=15, height=10)
+        frmrdbt.place(x=240,y=55)
         self.tso_option=tk.StringVar()
         self.tso_option.set(global_settings['TSO_option'][0])
-        self.reslabel=MyLabel(parent=self, label_setts=[None, 18, "e", 245, 30])
-        cics_radbutt = MyRadiobutt(parent=self,op_val=self.tso_option,val="CICS",pos_x=135)
-        tso_radbutt = MyRadiobutt(parent=self,op_val=self.tso_option,val="TSO",pos_x=190)
+        self.reslabel=MyLabel(parent=self, label_setts=[18, "e", 245, 30])
+        cics_radbutt = MyRadiobutt(parent=frmrdbt,op_val=self.tso_option,val="CICS")
+        tso_radbutt = MyRadiobutt(parent=frmrdbt,op_val=self.tso_option,val="TSO")
         cics_radbutt.config(command=self.update_frame_res)
         tso_radbutt.config(command=self.update_frame_res)
+        
         self.update_frame_res()
-        self.statuslabel=MyLabel(parent=self, label_setts=[None, 50, "w", 10, 200])
+        self.statuslabel=MyLabel(parent=self, label_setts=[50, "w", 10, 200])
         self.statuslabel.set_label("Ready!")
 
         self.image_bbr = tk.PhotoImage(file="Images\\Browse_button.png")
@@ -91,12 +95,12 @@ class PrintScreen(tk.Frame):
                             width=4
                             ).place(x=170,y=170)
 
-        frm = tk.Frame(self,width=15, height=50, bg="Red")
-        frm.place(x=90,y=80)
+        frmlst = tk.Frame(self,width=15, height=50)
+        frmlst.place(x=90,y=80)
 
-        self.screenlist = MyList(parent=frm)
+        self.screenlist = MyList(parent=frmlst)
         self.screenlist.bind('<<ListboxSelect>>', self.onselect_listbox)
-        self.screenlist.event_generate("<<ListboxSelect>>")
+        #self.screenlist.event_generate("<<ListboxSelect>>")
 
         num_vals = self.get_spin_vals(0)
         lett_vals = self.get_spin_vals(1)
@@ -119,6 +123,7 @@ class PrintScreen(tk.Frame):
         self.ontopcheckbox = MyCheckbox(parent=self,pos_x=300)
         self.ontopcheckbox.config(text="Stay on top")
         self.ontopcheckbox.config(command=self.toggleontop)
+
         self.listentry=MyEntry(parent=self, entry_setts=[12, 90, 175])
         self.listentry.bind('<Return>', self.onenter_entry)
         
@@ -131,6 +136,7 @@ class PrintScreen(tk.Frame):
             )
         if folder_path != "":
             self.pathentry.set_entry(folder_path)
+        self.update_settings()
 
     def get_spin_vals(self,vals_type):
         vals = []
@@ -205,7 +211,6 @@ class PrintScreen(tk.Frame):
                                 )
 
     def onenter_entry(self,evt):
-        print("Am apasat Enter")
         self.screenlist.insert_new(self.listentry.get_entry())
 
     def toggleontop(self):
@@ -215,6 +220,19 @@ class PrintScreen(tk.Frame):
         else:
             self.controller.wm_attributes("-topmost", 0)
             self.statuslabel.set_label("Always on top deactivated")
+
+    def update_settings(self):
+        global_settings['TSO_option'][0] = self.tso_option.get()
+        global_settings["checkbox_options"][0] = int(self.checkbox1.get_checkbox()==True)
+        global_settings["checkbox_options"][1] = int(self.checkbox2.get_checkbox()==True)
+        global_settings["checkbox_options"][2] = int(self.checkbox3.get_checkbox()==True)
+        global_settings["checkbox_options"][3] = int(self.checkbox4.get_checkbox()==True)
+        global_settings["screen_list"] = []
+        for i, list_value in enumerate(self.screenlist.get(0, tk.END)):
+            global_settings["screen_list"].append(list_value)
+        global_settings['save_path'][0] = self.pathentry.get_entry()
+        print(global_settings["screen_list"])
+        fill_file_from_dict("Settings\\settings1.txt",global_settings)
 
 class MyEntry(tk.Entry):
     def __init__(self,parent,entry_setts):
@@ -234,15 +252,16 @@ class MyEntry(tk.Entry):
 
 class MyLabel(tk.Label):
     def __init__(self,parent,label_setts):
-        tk.Label.__init__(self,parent)
+        tk.Label.__init__(self,
+                            parent,
+                            width=label_setts[0],
+                            anchor=label_setts[1],
+                            font=("Monospace",10),
+                            justify=tk.LEFT
+                            )
         self.label_var = tk.StringVar()
-        self.config(justify=tk.LEFT)
-        self.config(font=("Monospace",10))
-        self.config(background=label_setts[0])
-        self.config(width=label_setts[1])
-        self.config(anchor=label_setts[2])
         self.config(textvariable=self.label_var)
-        self.place(x=label_setts[3],y=label_setts[4])
+        self.place(x=label_setts[2],y=label_setts[3])
 
     def set_label(self, new_text):
         self.label_var.set(new_text)
@@ -251,29 +270,35 @@ class MyLabel(tk.Label):
         return self.label_var.get()
 
 class MyRadiobutt(tk.Radiobutton):
-    def __init__(self,parent=None,op_val=None,val="",pos_x=0):
-        tk.Radiobutton.__init__(self,parent)
-        self.config(text=val)
-        self.config(variable=op_val)
-        self.config(value=val)
-        self.place(x=pos_x,y=28)
+    def __init__(self,parent=None,op_val=None,val=""):
+        tk.Radiobutton.__init__(self,
+                                parent,
+                                text=val,
+                                value=val,
+                                variable=op_val,
+                                #justify=tk.LEFT,
+                                anchor="w",
+                                width=4,
+                                indicatoron=0
+                                )
+        self.pack(fill=tk.BOTH)
 
 class MyList(tk.Listbox):
     def __init__(self,parent):
         tk.Listbox.__init__(self,parent)
+
         self.config(exportselection=0)
         self.config(font=("Monospace",10))
         self.config(selectmode=tk.SINGLE)
-        self.config(height=len(global_settings["screen_list"]))
+        self.config(height=5)
         self.config(width=10)
         for i, item in enumerate(global_settings["screen_list"]):
             self.insert(tk.END, item)
         self.listdim=len(global_settings["screen_list"])
         self.mylistscrollbar=tk.Scrollbar(parent, orient="vertical", width=20)
         self.mylistscrollbar.pack(side=tk.RIGHT, fill=tk.BOTH)
-        self.mylistscrollbar.pack()
-        self.config(yscrollcommand=self.mylistscrollbar.set)
         self.mylistscrollbar.config(command=self.yview)
+        self.config(yscrollcommand=self.mylistscrollbar.set)
         self.select_set(0)
         self.pack(side=tk.LEFT)
 
@@ -292,8 +317,17 @@ class MyList(tk.Listbox):
             pass
 
     def insert_new(self,newitem):
-        print("Insert new value in list")
-        self.insert(tk.END, newitem)
+        itemnotexist = True
+        for i, listitem in enumerate(self.get(0,tk.END)):
+            if listitem == newitem:
+                itemnotexist = False
+
+        if itemnotexist:
+            try:
+                pos=self.curselection()[0]
+                self.insert(pos+1, newitem)
+            except:
+                self.insert(tk.END, newitem)
 
     def move_up(self):
         try:
@@ -327,7 +361,6 @@ class MyList(tk.Listbox):
         try:
             self.delete(self.curselection())
             self.listdim -= 1
-            print(self.listdim)
             return "Item deleted"
         except:
             return "Delete not possible"
@@ -401,7 +434,7 @@ class MyCheckbox(tk.Checkbutton):
     def set_checkbox(self,myvar):
         self.checkbox_var.set(myvar)
 
-class Settings(tk.Frame):
+class ChainPrints(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
@@ -413,5 +446,4 @@ class Settings(tk.Frame):
 
 if __name__ == "__main__":
     app = SampleApp()
-    #app.wm_attributes("-topmost", 1)
     app.mainloop()

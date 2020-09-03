@@ -50,10 +50,20 @@ def fill_file(file_name):
 	file1.writelines("TSO_dimmension: 450, 950\n")
 	file1.writelines("CICS_dimmension: 600, 950\n")
 	file1.writelines("TSO_option: CICS\n")
-	file1.writelines("Checkbox_options: 0, 0, 0, 0\n")
+	file1.writelines("checkbox_options: 0, 0, 0, 0\n")
 	file1.writelines("screen_list: CONT, SAVE, TREC, TBLT, TREV\n")
 	file1.writelines("form_dimensions: 400, 200\n")
 	file1.writelines("save_path: {0}".format(pathlib.Path().absolute()))
+	file1.close()
+
+def fill_file_from_dict(file_name,settings_dict):
+	file1 = open(file_name,'w')
+	for item in settings_dict:
+		newline1 = item + ": "
+		for subitem in settings_dict[item]:
+			newline1 += str(subitem) + ", "
+		newline1 = newline1[:-2]
+		file1.writelines(newline1 + "\n")
 	file1.close()
 
 if __name__== "__main__":
